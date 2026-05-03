@@ -1,7 +1,4 @@
 # ⚡ TruthLens: Dynamic Fake News Detection System
-<img width="1600" height="760" alt="WhatsApp Image 2026-04-16 at 10 20 19 AM" src="https://github.com/user-attachments/assets/c8e2df4f-4e8d-4405-82e7-d6c720a3d629" />
-<img width="1600" height="759" alt="WhatsApp Image 2026-04-16 at 10 20 24 AM" src="https://github.com/user-attachments/assets/a0ede5ab-8d56-48a6-b15f-7d4053d88445" />
-<img width="1600" height="763" alt="WhatsApp Image 2026-04-16 at 10 20 26 AM" src="https://github.com/user-attachments/assets/a05dfb0e-e8ce-4fd0-8c82-1ed195ce0435" />
 
 **TruthLens** is a production-ready, real-time news verification platform designed for high accuracy and performance on low-resource systems. It leverages the latest AI technologies to bring transparency back to the digital world.
 
@@ -27,8 +24,9 @@ Unlike traditional detectors that rely on static datasets, TruthLens performs **
 
 ## 📸 Visual Overview
 
-![Verification Result](https://raw.githubusercontent.com/user-attachments/assets/demo_screenshot.png)
-*(Example analysis showing the TruthLens verdict and AI reasoning components)*
+<img width="1600" height="760" alt="WhatsApp Image 2026-04-16 at 10 20 19 AM" src="https://github.com/user-attachments/assets/c8e2df4f-4e8d-4405-82e7-d6c720a3d629" />
+<img width="1600" height="759" alt="WhatsApp Image 2026-04-16 at 10 20 24 AM" src="https://github.com/user-attachments/assets/a0ede5ab-8d56-48a6-b15f-7d4053d88445" />
+<img width="1600" height="763" alt="WhatsApp Image 2026-04-16 at 10 20 26 AM" src="https://github.com/user-attachments/assets/a05dfb0e-e8ce-4fd0-8c82-1ed195ce0435" />
 
 ---
 

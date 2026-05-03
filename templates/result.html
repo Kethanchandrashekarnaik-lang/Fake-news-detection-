@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="animate-fade">
+    <div class="result-header">
+        <div>
+            <h1>Verification Result</h1>
+            <p class="text-dim">Analysis completed using Gemini 3 Flash & Live Web Search</p>
+        </div>
+        <div class="verdict-badge badge-{{ data.prediction.lower() }}">
+            {{ data.prediction }}
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <!-- Main Analysis -->
+        <div class="glass-panel">
+            <h3 style="color: var(--accent-primary); margin-bottom: 1rem;"><i class="fas fa-info-circle"></i> AI Reasoning</h3>
+            <p id="explanationText" style="margin-bottom: 2rem;">{{ data.explanation }}</p>
+
+            <h3 style="color: var(--accent-secondary); margin-bottom: 1rem;"><i class="fas fa-highlighter"></i> Highlighted Keywords</h3>
+            <div id="keywordHeatmap" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2rem;">
+                {% for word in data.keywords %}
+                <span class="btn btn-outline" style="padding: 0.3rem 0.8rem; font-size: 0.8rem; pointer-events: none;">{{ word }}</span>
+                {% endfor %}
+            </div>
+
+            <div style="margin-top: 2rem;">
+                <a href="{{ url_for('analyze_page') }}" class="btn btn-outline">Analyze Another</a>
+                <a href="{{ url_for('export_pdf', pred_id=data.id) }}" class="btn btn-primary">
+                    <i class="fas fa-file-pdf"></i> Download Report
+                </a>
+            </div>
+        </div>
+
+        <!-- Meter & Sources -->
+        <div class="glass-panel">
+            <div class="confidence-meter">
+                <h3 style="margin-bottom: 0.5rem;">Confidence Score</h3>
+                <div style="font-size: 3rem; font-weight: 800; color: var(--accent-primary);">
+                    <span id="confidenceVal">0</span>%
+                </div>
+                <div class="progress-container">
+                    <div id="confidenceBar" class="progress-bar" style="width: 0%;"></div>
+                </div>
+                <p style="margin-top: 1rem; color: var(--text-dim); font-size: 0.9rem;">
+                    Likelihood of the input being {{ data.prediction }}.
+                </p>
+            </div>
+
+            <div style="margin-top: 3rem;">
+                <h3 style="border-bottom: 1px solid var(--border-glass); padding-bottom: 0.5rem;">
+                    <i class="fas fa-link"></i> Verified Sources
+                </h3>
+                <div class="source-list">
+                    {% if data.sources %}
+                        {% for source in data.sources %}
+                        <a href="{{ source.url }}" target="_blank" class="source-card">
+                            <div style="font-weight: 600; color: var(--accent-primary);">{{ source.title }}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                {{ source.url }}
+                            </div>
+                        </a>
+                        {% endfor %}
+                    {% else %}
+                        <p style="color: var(--text-dim);">No direct citations found. Analysis based on general consensus.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Original Text View -->
+    <div class="glass-panel mt-4">
+        <h3 style="margin-bottom: 1rem;">Original Input</h3>
+        <div id="originalTextContent" style="background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 12px; font-size: 0.95rem; border: 1px solid var(--border-glass); max-height: 300px; overflow-y: auto; white-space: pre-wrap;">{{ data.input_text }}</div>
+    </div>
+    <!-- Data Bridge for JavaScript (Removes red lines in editor) -->
+    <div id="resultData" 
+         data-confidence="{{ data.confidence }}" 
+         data-keywords='{{ data.keywords | tojson | safe }}'
+         style="display: none;">
+    </div>
+</div>
+
+<script>
+window.onload = () => {
+    // 1. Get Data from Bridge
+    const dataContainer = document.getElementById('resultData');
+    const targetConf = parseInt(dataContainer.dataset.confidence) || 0;
+    const keywordsJson = JSON.parse(dataContainer.dataset.keywords || '[]');
+    
+    // 2. Animate Confidence Meter
+    const confVal = document.getElementById('confidenceVal');
+    const confBar = document.getElementById('confidenceBar');
+    
+    let currentConf = 0;
+    if (targetConf > 0) {
+        const interval = setInterval(() => {
+            if (currentConf >= targetConf) {
+                clearInterval(interval);
+                confVal.innerText = targetConf;
+                confBar.style.width = targetConf + '%';
+            } else {
+                currentConf++;
+                confVal.innerText = currentConf;
+                confBar.style.width = currentConf + '%';
+            }
+        }, 15);
+    } else {
+        confVal.innerText = "0";
+        confBar.style.width = "0%";
+    }
+
+    // 3. Robust Keyword Highlighting
+    const contentDiv = document.getElementById('originalTextContent');
+    
+    if (keywordsJson && keywordsJson.length > 0) {
+        const rawText = contentDiv.textContent;
+        const temp = document.createElement('div');
+        temp.textContent = rawText;
+        let safeHtml = temp.innerHTML;
+        
+        const escaped = keywordsJson
+            .filter(k => k && k.trim().length > 0)
+            .map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+            .sort((a, b) => b.length - a.length);
+            
+        if (escaped.length > 0) {
+            const regex = new RegExp(`(${escaped.join('|')})`, 'gi');
+            safeHtml = safeHtml.replace(regex, '<span class="highlight-node">$1</span>');
+            contentDiv.innerHTML = safeHtml;
+        }
+    }
+}
+</script>
+
+<style>
+    .mt-4 { margin-top: 2rem; }
+    .highlight-node {
+        background: rgba(255, 0, 229, 0.15);
+        color: var(--accent-secondary);
+        font-weight: 600;
+        border-bottom: 2px solid var(--accent-secondary);
+        padding: 0 2px;
+        border-radius: 2px;
+    }
+</style>
+{% endblock %}

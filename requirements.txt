@@ -1,0 +1,9 @@
+flask
+scikit-learn
+numpy
+requests
+beautifulsoup4
+reportlab
+waitress
+duckduckgo-search
+google-genai

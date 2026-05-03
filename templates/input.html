@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="glass-panel animate-fade" style="max-width: 800px; margin: 0 auto;">
+    <h1 style="text-align: center; margin-bottom: 0.5rem;">New Analysis</h1>
+    <p style="text-align: center; color: var(--text-dim); margin-bottom: 2rem;">Paste news text or a URL to check its authenticity.</p>
+
+    <div id="analyzeForm">
+        <div class="form-group">
+            <label for="url"><i class="fas fa-link"></i> Website URL (Optional)</label>
+            <input type="url" id="url" placeholder="https://news-site.com/article-url">
+        </div>
+
+        <div style="text-align: center; margin: 1rem 0; color: var(--text-dim);">— OR —</div>
+
+        <div class="form-group">
+            <label for="newsText"><i class="fas fa-file-alt"></i> News Text / Claim</label>
+            <textarea id="newsText" rows="6" placeholder="Paste the claim or article text here..."></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: center; margin-top: 2rem;">
+            <button id="submitBtn" class="btn btn-primary" style="width: 100%; max-width: 300px;">
+                <i class="fas fa-microchip"></i> Verify Claim
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" style="display: none; text-align: center; padding: 2rem;">
+        <div class="spinner" style="margin-bottom: 1.5rem;">
+            <i class="fas fa-circle-notch fa-spin fa-3x" style="color: var(--accent-primary);"></i>
+        </div>
+        <h2 style="margin-bottom: 0.5rem;">System Verifying...</h2>
+        <p id="loadingMsg" style="color: var(--text-dim);">Connecting to TruthLens AI and searching live sources.</p>
+        <div class="progress-container" style="max-width: 300px; margin: 1.5rem auto;">
+            <div id="fakeProgress" class="progress-bar" style="width: 10%;"></div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .mt-4 { margin-top: 2rem; }
+</style>
+
+<script>
+document.getElementById('submitBtn').addEventListener('click', async () => {
+    const text = document.getElementById('newsText').value;
+    const url = document.getElementById('url').value;
+
+    if (!text && !url) {
+        alert('Please provide either news text or a URL.');
+        return;
+    }
+
+    // Show loading
+    document.getElementById('analyzeForm').style.display = 'none';
+    document.getElementById('loadingState').style.display = 'block';
+
+    // Fake progress and status messages
+    let width = 10;
+    const statusMsgs = [
+        "Gemini is analyzing your input...",
+        "Searching for live verification sources...",
+        "Cross-referencing claims with verified news...",
+        "Generating final TruthLens reasoning..."
+    ];
+    let msgIdx = 0;
+    
+    const interval = setInterval(() => {
+        if (width >= 90) clearInterval(interval);
+        width += (95 - width) / 10; // Smoothing log curve
+        document.getElementById('fakeProgress').style.width = width + '%';
+        
+        if (width > (msgIdx + 1) * 20 && msgIdx < statusMsgs.length) {
+            document.getElementById('loadingMsg').innerText = statusMsgs[msgIdx];
+            msgIdx++;
+        }
+    }, 1000);
+
+    const slowLoadingTimeout = setTimeout(() => {
+        const msg = document.getElementById('loadingMsg');
+        if (msg) msg.innerText = "Processing high-volume data. Almost there...";
+    }, 12000);
+
+    try {
+        const response = await fetch('/api/predict', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text, url })
+        });
+
+        const data = await response.json();
+        clearTimeout(slowLoadingTimeout);
+
+        if (data.error) {
+            alert('System Message: ' + data.error);
+            document.getElementById('analyzeForm').style.display = 'block';
+            document.getElementById('loadingState').style.display = 'none';
+            clearInterval(interval);
+        } else {
+            // Redirect to result page
+            sessionStorage.setItem('lastResult', JSON.stringify(data));
+            window.location.href = '/result/' + data.prediction_id;
+        }
+    } catch (err) {
+        clearTimeout(slowLoadingTimeout);
+        alert('Network error. Please check your connection.');
+        document.getElementById('analyzeForm').style.display = 'block';
+        document.getElementById('loadingState').style.display = 'none';
+        clearInterval(interval);
+    }
+});
+</script>
+{% endblock %}

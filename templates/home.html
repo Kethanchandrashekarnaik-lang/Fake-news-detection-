@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero animate-fade">
+    <h1>Stop Fake News with <br> <span style="color: var(--accent-primary);">Real-time AI Verification</span></h1>
+    <p class="lead">Don't guess. Verify. TruthLens uses live internet search and advanced Gemini AI to fact-check any claim or article instantly.</p>
+    
+    <div class="cta-group">
+        <a href="{{ url_for('analyze_page') }}" class="btn btn-primary">
+            <i class="fas fa-search"></i> Start Analysis
+        </a>
+        <a href="{{ url_for('history_page') }}" class="btn btn-outline">
+            <i class="fas fa-history"></i> View History
+        </a>
+    </div>
+</section>
+
+<div class="grid-2 mt-4">
+    <div class="glass-panel animate-fade" style="animation-delay: 0.2s;">
+        <h3 style="color: var(--accent-primary); margin-bottom: 1rem;">
+            <i class="fas fa-globe"></i> Live Internet Verification
+        </h3>
+        <p>Unlike static models trained on old data, TruthLens fetches current information from across the web to verify breaking news.</p>
+    </div>
+    
+    <div class="glass-panel animate-fade" style="animation-delay: 0.3s;">
+        <h3 style="color: var(--accent-secondary); margin-bottom: 1rem;">
+            <i class="fas fa-brain"></i> Explainable AI Results
+        </h3>
+        <p>Get clear explanations and direct source links. See exactly why a claim was flagged as fake or misleading.</p>
+    </div>
+</div>
+
+<div class="glass-panel mt-4 animate-fade" style="animation-delay: 0.4s; text-align: center; margin-top: 2rem;">
+    <h2 style="font-size: 2rem; margin-bottom: 1rem;">Lightweight. Fast. Accurate.</h2>
+    <p>Optimized for modern systems, providing enterprise-grade fact checking without the heavy local model overhead.</p>
+</div>
+{% endblock %}

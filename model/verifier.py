@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 class dynamic_verifier:
     def __init__(self):
         self.api_key = Config.GEMINI_API_KEY
-        self.primary_model = Config.PRIMARY_MODEL
-        self.fallback_model = Config.FALLBACK_MODEL
+        self.primary_model = 'gemini-flash-latest'
+        self.fallback_model = 'gemini-2.0-flash-lite'
         self.scraper = get_scraper()
         
         if self.api_key:
